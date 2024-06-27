@@ -3,9 +3,18 @@ from PIL import Image, ImageDraw, ImageFont, ExifTags
 import textwrap
 import io
 from streamlit_cropper import st_cropper
+import os
 
 ####################
 # Functions
+
+# load fonts
+def load_font(font_name, size):
+    try:
+        return ImageFont.truetype(f"fonts/{font_name}.ttf", size)
+    except IOError:
+        st.warning("Default font is being used, which may be too small. Consider installing Liberation Sans for better results.")
+        return ImageFont.load_default()
 
 # Correct the orientation of an image based on EXIF data
 def correct_orientation(image):
@@ -63,20 +72,16 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     image.paste(photo1, (0 + img1_x, 0 + img1_y))
     image.paste(photo2, (0 + img2_x, 798 + img2_y))
 
-    # Define fonts and colors
-    try:
-        title_font = ImageFont.truetype("arial.ttf", 70)  # Adjusted font size
-        header_font = ImageFont.truetype("arial.ttf", 55)  # Adjusted font size
-        text_font = ImageFont.truetype("arial.ttf", 35)  # Adjusted font size
-    except IOError:
-        title_font = ImageFont.load_default()
-        header_font = ImageFont.load_default()
-        text_font = ImageFont.load_default()
+    # Load fonts
+    title_font = load_font("LiberationSans-Bold", 70)
+    header_font = load_font("LiberationSans-Bold", 55)
+    text_font = load_font("LiberationSans-Regular", 35)
     
+    # Font colors
     name_color = (0, 0, 0)  # Black
     country_color = (128, 128, 128)  # Gray
     header_color = (0, 0, 0)  # Black
-    text_color = (0, 128, 128)  # Teal
+    text_color = (0, 100, 100)  # Teal, formerly 128
 
     # Add the text information to the right
     # Name and Country
@@ -87,7 +92,7 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     draw.text((text_start_x + name_width + 25, text_start_y + 15), country, fill=country_color, font=header_font)
     
     # text area width
-    width = 50
+    width = 55
 
     # Goal
     text_start_y += 150
@@ -148,8 +153,8 @@ add_space()
 st.markdown('##### Photos')
 photo1 = st.file_uploader('Upload a photo of you', type=['png', 'jpg', 'jpeg', 'heic'], key='photo1')
 if photo1 is not None:
-    resize_option1 = st.radio("Resize option for first photo", ["Fit to area", "Interactive crop"], key="resize_option1")
-    if resize_option1 == "Fit to area":
+    resize_option1 = st.radio("Resize option for first photo", ["Fit whole image", "Interactive crop"], key="resize_option1")
+    if resize_option1 == "Fit whole image":
         photo1 = Image.open(photo1)
         photo1 = fit_to_area(photo1, 1000, 782)
     else:
@@ -158,8 +163,8 @@ if photo1 is not None:
 
 photo2 = st.file_uploader('Upload a photo of something from your life', type=['png', 'jpg', 'jpeg', 'heic'], key='photo2')
 if photo2 is not None:
-    resize_option2 = st.radio("Resize option for second photo", ["Fit to area", "Interactive crop"], key="resize_option2")
-    if resize_option2 == "Fit to area":
+    resize_option2 = st.radio("Resize option for second photo", ["Fit whole image", "Interactive crop"], key="resize_option2")
+    if resize_option2 == "Fit whole image":
         photo2 = Image.open(photo2)
         photo2 = fit_to_area(photo2, 1000, 782)
     else:
