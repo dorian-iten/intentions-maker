@@ -76,12 +76,14 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     title_font = load_font("LiberationSans-Bold", 70)
     header_font = load_font("LiberationSans-Bold", 55)
     text_font = load_font("LiberationSans-Regular", 35)
+    tag_font = load_font("LiberationSans-Regular", 20)
     
     # Font colors
     name_color = (0, 0, 0)  # Black
     country_color = (128, 128, 128)  # Gray
     header_color = (0, 0, 0)  # Black
-    text_color = (0, 100, 100)  # Teal, formerly 128
+    text_color = (0, 100, 100)  # Teal, formerly 0, 128, 128
+    tag_color = (128, 128, 128)  # Gray
 
     # Add the text information to the right
     # Name and Country
@@ -92,13 +94,13 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     draw.text((text_start_x + name_width + 25, text_start_y + 15), country, fill=country_color, font=header_font)
     
     # text area width
-    width = 55
+    text_width = 55
 
     # Goal
     text_start_y += 150
     draw.text((text_start_x, text_start_y), "Goal", fill=header_color, font=header_font)
     text_start_y += 70
-    for line in textwrap.wrap(goal, width=width):
+    for line in textwrap.wrap(goal, width=text_width):
         draw.text((text_start_x, text_start_y), line, font=text_font, fill=text_color)
         text_start_y += 45
 
@@ -106,7 +108,7 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     text_start_y += 40
     draw.text((text_start_x, text_start_y), "Challenges", fill=header_color, font=header_font)
     text_start_y += 70
-    for line in textwrap.wrap(challenges, width=width):
+    for line in textwrap.wrap(challenges, width=text_width):
         draw.text((text_start_x, text_start_y), line, font=text_font, fill=text_color)
         text_start_y += 45
 
@@ -114,9 +116,18 @@ def create_image(name, country, goal, challenges, commitment, photo1, photo2):
     text_start_y += 40
     draw.text((text_start_x, text_start_y), "Commitment", fill=header_color, font=header_font)
     text_start_y += 70
-    for line in textwrap.wrap(commitment, width=width):
+    for line in textwrap.wrap(commitment, width=text_width):
         draw.text((text_start_x, text_start_y), line, font=text_font, fill=text_color)
         text_start_y += 45
+    
+    # Add the tag in the bottom-right corner
+    tag_text = "made with intentions-maker <3"
+    tag_bbox = draw.textbbox((0, 0), tag_text, font=tag_font)
+    tag_width = tag_bbox[2] - tag_bbox[0]
+    tag_height = tag_bbox[3] - tag_bbox[1]
+    padding = 15
+    tag_position = (width - tag_width - padding, height - tag_height - padding)
+    draw.text(tag_position, tag_text, font=tag_font, fill=tag_color)
 
     # Save the image to a bytes object
     img_bytes = io.BytesIO()
